@@ -35,19 +35,19 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
-     * Retrieves comments for a specific post by its ID with pagination support.
+     * Retrieve a paginated list of comments for a specific post.
      *
-     * @param postId The ID of the post to retrieve comments for.
-     * @param page   The page number (0-indexed).
-     * @param size   The number of items per page.
-     * @return A list of `CommentResponseDto` representing the paginated comments for the post.
+     * @param postId The unique ID of the post to fetch comments for.
+     * @param page   The page number for pagination (default: 0).
+     * @param size   The number of comments per page (default: 10).
+     * @return A list of {@link CommentResponseDto} representing the comments for the post.
      */
     @Override
-    public List<CommentResponseDto> getCommentsByPostId(UUID postId, int page, int size) {
+    public List<CommentResponseDto> getComments(UUID postId, int page, int size) {
         UUID userId = getUserIdOrNull();
         Pageable commentPage = PageRequest.of(page, size);
 
-        List<Comment> comments = commentRepository.findAllByPostId(postId, commentPage);
+        List<Comment> comments = commentRepository.findAllWithoutReplies(postId, commentPage);
 
         return comments.stream()
                 .map(comment -> new CommentResponseDto(
@@ -55,9 +55,61 @@ public class CommentServiceImpl implements CommentService {
                         comment.getUser().getId(),
                         comment.getContent(),
                         comment.getCreatedAt(),
-                        isCreator(userId, comment)
+                        isCreator(userId, comment),
+                        isRepliesExists(comment)
                 )).toList();
     }
+
+    /**
+     * Retrieve a paginated list of replies for a specific comment.
+     *
+     * @param commentId The unique ID of the comment to fetch replies for.
+     * @param page      The page number for pagination (default: 0).
+     * @param size      The number of replies per page (default: 10).
+     * @return A list of {@link CommentResponseDto} representing the replies to the comment.
+     */
+    @Override
+    public List<CommentResponseDto> getReplies(UUID commentId, int page, int size) {
+        UUID userId = getUserIdOrNull();
+
+        List<Comment> paginatedComments = commentRepository.findByParentCommentId(commentId, PageRequest.of(page, size));
+
+        return paginatedComments.stream()
+                .map(reply -> new CommentResponseDto(
+                        reply.getId(),
+                        reply.getUser().getId(),
+                        reply.getContent(),
+                        reply.getCreatedAt(),
+                        isCreator(userId, reply),
+                        isRepliesExists(reply)
+                ))
+                .toList();
+    }
+
+    /**
+     * Create a new reply for a specific comment.
+     *
+     * @param commentRequestDto The {@link CommentRequestDto} containing the reply details.
+     * @param commentId         The unique ID of the comment to reply to.
+     * @return The ID of the created reply.
+     * @throws ResourceNotFoundException if the parent comment with the specified ID is not found.
+     */
+    @Override
+    public UUID createReply(CommentRequestDto commentRequestDto, UUID commentId) {
+        UUID userId = getUserId();
+        Comment parrentComment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("comment with id " + commentId + " not found!"));
+        Comment comment = commentMapper.toCommentEntity(commentRequestDto, parrentComment.getPost().getId());
+
+        comment.setParentComment(parrentComment);
+        comment.setUser(
+                userRepository.findById(userId)
+                        .orElseThrow(() -> new ResourceNotFoundException("user not found"))
+        );
+
+        return commentRepository.save(comment).getId();
+    }
+
 
     /**
      * Creates a new comment for a specific post.
@@ -70,9 +122,13 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public UUID createComment(CommentRequestDto commentRequestDto, UUID postId) {
         UUID userId = getUserId();
-
         Comment comment = commentMapper.toCommentEntity(commentRequestDto, postId);
-        comment.setUser(userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user not found")));
+
+        comment.setUser(
+                userRepository.findById(userId)
+                        .orElseThrow(() -> new ResourceNotFoundException("user not found"))
+        );
+
         return commentRepository.save(comment).getId();
     }
 
@@ -102,7 +158,8 @@ public class CommentServiceImpl implements CommentService {
                 comment.getUser().getId(),
                 commentRequestDto.content(),
                 comment.getCreatedAt(),
-                isCreator(postUserId, comment)
+                isCreator(postUserId, comment),
+                isRepliesExists(comment)
         );
     }
 
@@ -152,10 +209,14 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-    private static boolean isCreator(UUID userId, Comment comment) {
+    private boolean isCreator(UUID userId, Comment comment) {
         if (userId == null) {
             return false;
         }
         return userId.equals(comment.getUser().getId());
+    }
+
+    private boolean isRepliesExists(Comment comment) {
+        return !comment.getReplies().isEmpty();
     }
 }
