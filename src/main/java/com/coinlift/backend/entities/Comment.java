@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -35,13 +37,22 @@ public class Comment {
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "FK_USERS_COMMENTS"))
     private User user;
 
-    public Comment(UUID id, String content, LocalDateTime createdAt, LocalDateTime updatedAt, Post post, User user) {
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parentComment")
+    private List<Comment> replies = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
+
+    public Comment(UUID id, String content, LocalDateTime createdAt, LocalDateTime updatedAt, Post post, User user, List<Comment> replies, Comment parentComment) {
         this.id = id;
         this.content = content;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.post = post;
         this.user = user;
+        this.replies = replies;
+        this.parentComment = parentComment;
     }
 
     public Comment() {
@@ -93,5 +104,21 @@ public class Comment {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Comment> getReplies() {
+        return replies;
+    }
+
+    public void setReplies(List<Comment> replies) {
+        this.replies = replies;
+    }
+
+    public Comment getParentComment() {
+        return parentComment;
+    }
+
+    public void setParentComment(Comment parentComment) {
+        this.parentComment = parentComment;
     }
 }
