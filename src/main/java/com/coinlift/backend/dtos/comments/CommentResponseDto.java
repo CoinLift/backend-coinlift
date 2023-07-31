@@ -13,6 +13,8 @@ public record CommentResponseDto(
 
         LocalDateTime createdAt,
 
-        boolean isCommentCreator
+        boolean isCommentCreator,
+
+        boolean isRepliesExist
 ) {
 }

@@ -10,11 +10,19 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
-    @Query("SELECT c FROM Comment c WHERE c.post.id = ?1 ORDER BY c.createdAt DESC")
-    List<Comment> findAllByPostId(UUID postId, Pageable pageable);
+
+    @Query("""
+            SELECT c FROM Comment c
+            WHERE c.post.id = :postId AND c.parentComment IS NULL
+            ORDER BY c.createdAt DESC
+            """)
+    List<Comment> findAllWithoutReplies(UUID postId, Pageable pageable);
+
 
     @Query("SELECT c FROM Comment c WHERE c.post.id = ?1 AND c.id = ?2")
     Optional<Comment> findByPostIdAndCommentId(UUID postId, UUID commentId);
+
+    List<Comment> findByParentCommentId(UUID commentId, Pageable commentPage);
 
 //    @Query("SELECT NEW com.coinlift.backend.dtos.comments.CommentResponseDto(c.id, c.content, c.createdAt, CASE WHEN c.user.id = :currentUserId THEN true ELSE false END) " +
 //            "FROM Comment c WHERE c.post.id = :postId " +

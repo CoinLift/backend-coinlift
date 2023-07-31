@@ -68,7 +68,7 @@ class CommentControllerTest {
         UUID commentId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
 
-        CommentResponseDto commentResponseDto = new CommentResponseDto(commentId, userId, "test content", LocalDateTime.now(), true);
+        CommentResponseDto commentResponseDto = new CommentResponseDto(commentId, userId, "test content", LocalDateTime.now(), true, false);
 
         when(commentService.updateComment(commentRequestDto, postId, commentId)).thenReturn(commentResponseDto);
 

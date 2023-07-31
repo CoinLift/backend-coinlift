@@ -1,7 +1,7 @@
 package com.coinlift.backend.controllers;
 
-import com.coinlift.backend.dtos.comments.CommentResponseDto;
 import com.coinlift.backend.dtos.comments.CommentRequestDto;
+import com.coinlift.backend.dtos.comments.CommentResponseDto;
 import com.coinlift.backend.services.comments.CommentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,7 @@ public class CommentController {
     public ResponseEntity<List<CommentResponseDto>> getAllComments(@PathVariable("postId") UUID uuid,
                                                                    @RequestParam(name = "page", defaultValue = "0") int page,
                                                                    @RequestParam(name = "size", defaultValue = "10") int size) {
-        return ResponseEntity.ok(commentService.getCommentsByPostId(uuid, page, size));
+        return ResponseEntity.ok(commentService.getComments(uuid, page, size));
     }
 
     /**
@@ -57,7 +57,7 @@ public class CommentController {
      * @param commentId         The unique ID of the comment to be updated.
      * @return A response entity containing the updated comment details and HTTP status 200 (OK).
      */
-    @PatchMapping("{commentId}")
+    @PatchMapping("/{commentId}")
     public ResponseEntity<CommentResponseDto> updateComment(@RequestBody CommentRequestDto commentRequestDto,
                                                             @PathVariable("postId") UUID postId,
                                                             @PathVariable("commentId") UUID commentId) {
@@ -71,7 +71,7 @@ public class CommentController {
      * @param commentId The unique ID of the comment to be removed.
      * @return A response entity with a success message upon successful comment deletion.
      */
-    @DeleteMapping("{commentId}")
+    @DeleteMapping("/{commentId}")
     public ResponseEntity<String> removeComment(@PathVariable("postId") UUID postId,
                                                 @PathVariable("commentId") UUID commentId) {
         commentService.deleteComment(postId, commentId);
