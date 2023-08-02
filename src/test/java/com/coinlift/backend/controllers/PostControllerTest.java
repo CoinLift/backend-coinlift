@@ -3,6 +3,7 @@ package com.coinlift.backend.controllers;
 import com.coinlift.backend.dtos.posts.PostDetailsResponseDto;
 import com.coinlift.backend.dtos.posts.PostRequestDto;
 import com.coinlift.backend.dtos.posts.PostShortResponseDto;
+import com.coinlift.backend.dtos.users.UserMainInfoDto;
 import com.coinlift.backend.services.posts.PostService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +22,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +46,7 @@ class PostControllerTest {
 
     private List<PostShortResponseDto> postShortResponseDtoList;
     private List<PostDetailsResponseDto> postResponseDtoList;
+    UserMainInfoDto userMainInfoDto;
 
 
     @BeforeEach
@@ -55,11 +56,13 @@ class PostControllerTest {
                 new PostShortResponseDto(UUID.randomUUID(), "content_2", new byte[0], 34)
         );
 
+         userMainInfoDto = new UserMainInfoDto("username", new byte[3], false);
+
         postResponseDtoList = Arrays.asList(
-                new PostDetailsResponseDto(UUID.randomUUID(), UUID.randomUUID(), "test content_1", new byte[0], true,
-                        LocalDateTime.now(), 3, 4),
-                new PostDetailsResponseDto(UUID.randomUUID(), UUID.randomUUID(), "test content_2", new byte[0], false,
-                        LocalDateTime.now(), 23, 44)
+                new PostDetailsResponseDto(UUID.randomUUID(), "test content_1", new byte[0], true,
+                        6435, 3, 4, userMainInfoDto),
+                new PostDetailsResponseDto(UUID.randomUUID(), "test content_2", new byte[0], false,
+                        5763, 23, 44, userMainInfoDto)
         );
 
     }
@@ -80,7 +83,7 @@ class PostControllerTest {
     @DisplayName("GET api/v1/posts")
     void getAllPosts_returnsListOfPosts() throws Exception {
         int page = 0;
-        int size = 20;
+        int size = 15;
 
         when(postService.getAllPosts(page, size)).thenReturn(postResponseDtoList);
 
@@ -99,8 +102,10 @@ class PostControllerTest {
         int size = 20;
         Pageable pageable = PageRequest.of(page, size);
 
-        PostDetailsResponseDto postResponseDto = new PostDetailsResponseDto(uuid, UUID.randomUUID(), "test content_2",
-                new byte[0], false, LocalDateTime.now(), 23, 44);
+        UserMainInfoDto userMainInfoDto = new UserMainInfoDto("username", new byte[3], false);
+
+        PostDetailsResponseDto postResponseDto = new PostDetailsResponseDto(uuid, "test content_2",
+                new byte[0], false, 645653, 23, 44, userMainInfoDto);
 
         when(postService.getPostById(uuid, pageable)).thenReturn(postResponseDto);
 
@@ -153,8 +158,10 @@ class PostControllerTest {
 
         PostRequestDto postRequestDto = new PostRequestDto("test content");
 
-        PostDetailsResponseDto postResponseDto = new PostDetailsResponseDto(postId, UUID.randomUUID(), "test content",
-                new byte[0], false, LocalDateTime.now(), 23, 44);
+        UserMainInfoDto userMainInfoDto = new UserMainInfoDto("username", new byte[3], false);
+
+        PostDetailsResponseDto postResponseDto = new PostDetailsResponseDto(postId, "test content",
+                new byte[0], false, 653, 23, 44, userMainInfoDto);
         when(postService.updatePost(eq(postId), any(PostRequestDto.class))).thenReturn(postResponseDto);
 
         mockMvc.perform(patch("/api/v1/posts/{postId}", postId)

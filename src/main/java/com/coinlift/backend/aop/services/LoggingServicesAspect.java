@@ -2,10 +2,7 @@ package com.coinlift.backend.aop.services;
 
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -46,5 +43,11 @@ public class LoggingServicesAspect {
         } else {
             log.debug("\u001B[91m" + "Service: " + methodName + " - end." + "\u001B[0m");
         }
+    }
+
+    @AfterThrowing(value = "allPublicMethods()", throwing = "exception")
+    public void logAfterThrowing(JoinPoint joinPoint, Exception exception) {
+        String methodName = joinPoint.getSignature().toShortString();
+        log.error("\u001B[91m" + "Service: " + methodName + " - Exception thrown: " + exception.getMessage() + "\u001B[0m");
     }
 }

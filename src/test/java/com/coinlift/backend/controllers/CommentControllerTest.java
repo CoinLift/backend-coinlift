@@ -2,6 +2,7 @@ package com.coinlift.backend.controllers;
 
 import com.coinlift.backend.dtos.comments.CommentRequestDto;
 import com.coinlift.backend.dtos.comments.CommentResponseDto;
+import com.coinlift.backend.dtos.users.UserMainInfoDto;
 import com.coinlift.backend.services.comments.CommentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
@@ -66,9 +66,10 @@ class CommentControllerTest {
     void updateComment_returnsCommentResponseDto() throws Exception {
         UUID postId = UUID.randomUUID();
         UUID commentId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
 
-        CommentResponseDto commentResponseDto = new CommentResponseDto(commentId, userId, "test content", LocalDateTime.now(), true, false);
+        UserMainInfoDto userMainInfoDto = new UserMainInfoDto("username", new byte[3], false);
+
+        CommentResponseDto commentResponseDto = new CommentResponseDto(commentId, "test content", 5354, true, false, userMainInfoDto);
 
         when(commentService.updateComment(commentRequestDto, postId, commentId)).thenReturn(commentResponseDto);
 

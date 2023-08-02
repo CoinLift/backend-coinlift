@@ -17,16 +17,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     /**
-     * Loads user details by their email during the authentication process.
+     * Loads user details by their username or email during the authentication process.
      *
-     * @param email The email of the user to load.
+     * @param usernameOrEmail The username or email of the user to load.
      * @return A custom implementation of the UserDetails interface, containing the user details.
-     * @throws UsernameNotFoundException if the user with the provided email is not found in the database.
+     * @throws UsernameNotFoundException if the user with the provided username or email is not found in the database.
      */
     @Override
-    public MyUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
+    public MyUserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+        User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
         return new MyUserDetails(user);
     }
 }
