@@ -8,9 +8,9 @@ import java.util.UUID;
 
 public interface FollowerService {
 
-    void followUser(UUID followingId);
+    void followUser(String followingUsername);
 
-    void unfollowUser(UUID followingId);
+    void unfollowUser(String followingUsername);
 
     UserMainInfoDto getUserMainInfo(UUID userId);
 

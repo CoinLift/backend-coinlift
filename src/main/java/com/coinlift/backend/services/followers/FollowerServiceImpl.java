@@ -39,19 +39,20 @@ public class FollowerServiceImpl implements FollowerService {
     }
 
     /**
-     * Follows a user with the specified `followingId`.
+     * Follows a user with the specified `followingUsername`.
      *
-     * @param followingId The UUID of the user to be followed.
-     * @throws IllegalStateException If the current user is already following the specified user.
+     * @param followingUsername The username of the user to be followed.
+     * @throws IllegalStateException     If the current user is already following the specified user.
+     * @throws ResourceNotFoundException If the user with the given `followingUsername` is not found.
      */
     @Override
     @Transactional
-    public void followUser(UUID followingId) {
+    public void followUser(String followingUsername) {
         UUID followerId = getUserId();
         User from = getUserById(followerId);
-        User to = getUserById(followingId);
+        User to = getUserByUsername(followingUsername);
 
-        if (isFollowing(followingId)) {
+        if (isFollowing(to.getId())) {
             throw new IllegalStateException("You are already following this user.");
         }
 
@@ -65,19 +66,20 @@ public class FollowerServiceImpl implements FollowerService {
     }
 
     /**
-     * Unfollows a user with the specified `followingId`.
+     * Unfollows a user with the specified `followingUsername`.
      *
-     * @param followingId The UUID of the user to be unfollowed.
-     * @throws IllegalStateException If the current user is not following the specified user.
+     * @param followingUsername The username of the user to be unfollowed.
+     * @throws IllegalStateException     If the current user is not following the specified user.
+     * @throws ResourceNotFoundException If the user with the given `followingUsername` is not found.
      */
     @Override
     @Transactional
-    public void unfollowUser(UUID followingId) {
+    public void unfollowUser(String followingUsername) {
         UUID followerId = getUserId();
         User from = getUserById(followerId);
-        User to = getUserById(followingId);
+        User to = getUserByUsername(followingUsername);
 
-        if (!isFollowing(followingId)) {
+        if (!isFollowing(to.getId())) {
             throw new IllegalStateException("You are not following this user.");
         }
 
@@ -104,9 +106,8 @@ public class FollowerServiceImpl implements FollowerService {
         User user = getUserById(userId);
 
         return new UserMainInfoDto(
-                userId,
                 user.getUsername(),
-                getUserImage(user), // TODO: implement methods that allow to add the profile image
+                getUserImage(user), // TODO: implement methods that will allow to add the profile image
                 followerRepository.existsByFrom_IdAndTo_Id(currentUserId, userId)
         );
     }
@@ -169,6 +170,12 @@ public class FollowerServiceImpl implements FollowerService {
     private User getUserById(UUID userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException(String.format("User with id %s not found.", userId))
+        );
+    }
+
+    private User getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new ResourceNotFoundException(String.format("User with username %s not found.", username))
         );
     }
 
