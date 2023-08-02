@@ -38,9 +38,9 @@ public class FollowerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User successfully followed")
     })
-    @PostMapping("/{userId}/follow")
-    public ResponseEntity<String> followUser(@PathVariable String userId) {
-        followerService.followUser(UUID.fromString(userId));
+    @PostMapping("/{username}/follow")
+    public ResponseEntity<String> followUser(@PathVariable String username) {
+        followerService.followUser(username);
         return ResponseEntity.ok("User successfully followed.");
     }
 
@@ -54,9 +54,9 @@ public class FollowerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User successfully unfollowed")
     })
-    @PostMapping("/{followingId}/unfollow")
-    public ResponseEntity<String> unfollowUser(@PathVariable UUID followingId) {
-        followerService.unfollowUser(followingId);
+    @PostMapping("/{username}/unfollow")
+    public ResponseEntity<String> unfollowUser(@PathVariable String username) {
+        followerService.unfollowUser(username);
         return ResponseEntity.ok("User successfully unfollowed.");
     }
 
