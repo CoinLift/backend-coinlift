@@ -26,6 +26,19 @@ spring:
   codec:
     max-in-memory-size: 10MB
 
+  # Mail configuration
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+          auth: true
+
 logging:
   pattern:
     #    console: "%highlight{[%-5level]} %cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %yellow([%t]) %magenta(%logger{36}) - %msg%n"
@@ -35,8 +48,6 @@ logging:
   level:
     org.springframework: info
     com.coinlift.backend: debug
-
-
 
 # AWS data
 aws:
