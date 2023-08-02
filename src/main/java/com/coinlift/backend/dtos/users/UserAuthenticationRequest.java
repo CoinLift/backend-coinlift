@@ -1,29 +1,33 @@
 package com.coinlift.backend.dtos.users;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import lombok.Data;
 
 import java.util.Objects;
 
 @Builder
 public class UserAuthenticationRequest {
-    private String email;
+
+    @Schema(description = "The user's email address or username.", example = "john.doe@example.com or john_doe")
+    private String emailOrUsername;
+
+    @Schema(description = "The user's password.", example = "myStrongPassword123!")
     private String password;
 
-    public UserAuthenticationRequest(String email, String password) {
-        this.email = email;
+    public UserAuthenticationRequest(String emailOrUsername, String password) {
+        this.emailOrUsername = emailOrUsername;
         this.password = password;
     }
 
     public UserAuthenticationRequest() {
     }
 
-    public String getEmail() {
-        return email;
+    public String getEmailOrUsername() {
+        return emailOrUsername;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmailOrUsername(String emailOrUsername) {
+        this.emailOrUsername = emailOrUsername;
     }
 
     public String getPassword() {
@@ -37,7 +41,7 @@ public class UserAuthenticationRequest {
     @Override
     public String toString() {
         return "UserAuthenticationRequest{" +
-                "email='" + email + '\'' +
+                "email='" + emailOrUsername + '\'' +
                 ", password='" + password + '\'' +
                 '}';
     }
@@ -47,11 +51,11 @@ public class UserAuthenticationRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserAuthenticationRequest that = (UserAuthenticationRequest) o;
-        return Objects.equals(email, that.email) && Objects.equals(password, that.password);
+        return Objects.equals(emailOrUsername, that.emailOrUsername) && Objects.equals(password, that.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, password);
+        return Objects.hash(emailOrUsername, password);
     }
 }

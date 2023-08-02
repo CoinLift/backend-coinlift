@@ -4,6 +4,8 @@ import com.coinlift.backend.dtos.users.AuthenticationResponse;
 import com.coinlift.backend.dtos.users.UserAuthenticationRequest;
 import com.coinlift.backend.dtos.users.UserRegistrationRequest;
 import com.coinlift.backend.entities.*;
+import com.coinlift.backend.exceptions.DuplicateUserException;
+import com.coinlift.backend.exceptions.PasswordMismatchException;
 import com.coinlift.backend.repositories.TokenRepository;
 import com.coinlift.backend.repositories.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,21 +44,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      *
      * @param userRegistrationRequest The user registration request containing user details.
      * @return An AuthenticationResponse containing the generated JWT token upon successful registration.
-     * @throws IllegalArgumentException if the password and confirm password do not match during registration.
      */
     @Override
     public AuthenticationResponse register(UserRegistrationRequest userRegistrationRequest) {
         String pass = userRegistrationRequest.password();
         String confirmPass = userRegistrationRequest.confirmPassword();
+        String emailAddress = userRegistrationRequest.emailAddress();
+        String username = userRegistrationRequest.username();
 
-        if (!pass.equals(confirmPass)) {
-            throw new IllegalArgumentException("Password and confirm password don't match");
-        }
+        checkEmailAndUsernameUniqueness(emailAddress, username);
+        validatePasswordConfirmation(pass, confirmPass);
 
         User user = User.builder()
-                .username(userRegistrationRequest.username())
-                .email(userRegistrationRequest.emailAddress())
-                .password(passwordEncoder.encode(userRegistrationRequest.password()))
+                .username(username.toLowerCase())
+                .email(emailAddress.toLowerCase())
+                .password(passwordEncoder.encode(pass))
                 .role(Role.USER)
                 .imageUrl("af5be274-71e7-4561-98fd-b33f80f759cf")
                 .followersCount(0)
@@ -75,25 +77,43 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     /**
-     * Authenticates a user by validating the provided email and password and generates a new JWT token upon successful authentication.
+     * Authenticates a user based on the provided email or username and password, generating a new JWT token upon successful authentication.
      *
-     * @param userRegistrationRequest The user authentication request containing the user's email and password.
+     * @param userAuthenticationRequest The user authentication request containing the user's email or username and password.
      * @return An AuthenticationResponse containing the generated JWT token upon successful authentication.
+     * @throws org.springframework.security.authentication.BadCredentialsException if the provided email/username and password combination is invalid.
+     * @throws org.springframework.security.core.userdetails.UsernameNotFoundException if the user with the provided email or username is not found in the database.
      */
     @Override
-    public AuthenticationResponse authenticate(UserAuthenticationRequest userRegistrationRequest) {
+    public AuthenticationResponse authenticate(UserAuthenticationRequest userAuthenticationRequest) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                userRegistrationRequest.getEmail(),
-                userRegistrationRequest.getPassword()
+                userAuthenticationRequest.getEmailOrUsername(),
+                userAuthenticationRequest.getPassword()
         ));
 
-        MyUserDetails userDetails = userDetailsService.loadUserByUsername(userRegistrationRequest.getEmail());
+        MyUserDetails userDetails = userDetailsService.loadUserByUsername(userAuthenticationRequest.getEmailOrUsername());
         String jwtToken = jwtService.generateToken(userDetails);
         revokeUserTokens(userDetails.user());
         saveUserToken(userDetails.user(), jwtToken);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    private void validatePasswordConfirmation(String password, String confirmPassword) {
+        if (!password.equals(confirmPassword)) {
+            throw new PasswordMismatchException("Password and confirm password don't match.");
+        }
+    }
+
+    private void checkEmailAndUsernameUniqueness(String email, String username) {
+        if (userRepository.existsByUsername(username)) {
+            throw new DuplicateUserException("User with this username already exists.");
+        }
+
+        if (userRepository.existsByEmail(email)) {
+            throw new DuplicateUserException("User with this email already exists.");
+        }
     }
 
     private void revokeUserTokens(User user) {
