@@ -74,7 +74,7 @@ public class PostServiceImpl implements PostService {
                             post.getId(),
                             post.getContent(),
                             image,
-                            0
+                            post.getLikeCount()
                     );
                 })
                 .toList();
@@ -100,7 +100,7 @@ public class PostServiceImpl implements PostService {
                 isCreator(getUserIdOrNull(), post),
                 Duration.between(post.getCreatedAt(), LocalDateTime.now()).getSeconds(),
                 post.getComments().size(),
-                0,
+                post.getLikeCount(),
                 followerService.getUserMainInfo(post.getUser().getId())
         );
     }
@@ -183,7 +183,7 @@ public class PostServiceImpl implements PostService {
                 true,
                 Duration.between(post.getCreatedAt(), LocalDateTime.now()).getSeconds(),
                 post.getComments().size(),
-                0,
+                post.getLikeCount(),
                 followerService.getUserMainInfo(post.getUser().getId())
         );
     }
@@ -211,7 +211,7 @@ public class PostServiceImpl implements PostService {
                             isCreator(getUserIdOrNull(), post),
                             Duration.between(post.getCreatedAt(), LocalDateTime.now()).getSeconds(),
                             commentCount,
-                            0,
+                            post.getLikeCount(),
                             followerService.getUserMainInfo(post.getUser().getId())
                     );
                 }).toList();
@@ -254,7 +254,7 @@ public class PostServiceImpl implements PostService {
         );
     }
 
-    private static UUID getUserId() {
+    private UUID getUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof AnonymousAuthenticationToken) {
             throw new DeniedAccessException("You can't do it before authenticate!");
