@@ -8,6 +8,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
-    @Query("SELECT u FROM User u WHERE u.email = ?1")
-    Optional<User> findByEmail(String email);
+
+    @Query("""
+            SELECT u FROM User u WHERE LOWER(u.username) = LOWER(:username)
+            OR LOWER(u.email) = LOWER(:email)
+            """)
+    Optional<User> findByUsernameOrEmail(String username, String email);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByUsername(String username);
 }
