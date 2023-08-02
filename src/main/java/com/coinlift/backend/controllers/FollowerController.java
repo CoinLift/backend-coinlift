@@ -31,7 +31,7 @@ public class FollowerController {
     /**
      * Endpoint to follow a user by the current user.
      *
-     * @param userId The unique ID of the user to follow.
+     * @param username The unique username of the user to follow.
      * @return A response entity with a success message upon successful follow.
      */
     @Operation(summary = "Follow a user by the current user")
@@ -47,7 +47,7 @@ public class FollowerController {
     /**
      * Endpoint to unfollow a user by the current user.
      *
-     * @param followingId The unique ID of the user to unfollow.
+     * @param username The unique username of the user to unfollow.
      * @return A response entity with a success message upon successful unfollow.
      */
     @Operation(summary = "Unfollow a user by the current user")
