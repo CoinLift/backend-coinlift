@@ -8,6 +8,8 @@ import com.coinlift.backend.exceptions.DuplicateUserException;
 import com.coinlift.backend.exceptions.PasswordMismatchException;
 import com.coinlift.backend.repositories.TokenRepository;
 import com.coinlift.backend.repositories.UserRepository;
+import com.coinlift.backend.services.users.security.JwtService;
+import com.coinlift.backend.services.users.security.UserDetailsServiceImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;

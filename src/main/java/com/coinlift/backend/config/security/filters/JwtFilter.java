@@ -2,8 +2,8 @@ package com.coinlift.backend.config.security.filters;
 
 import com.coinlift.backend.entities.MyUserDetails;
 import com.coinlift.backend.repositories.TokenRepository;
-import com.coinlift.backend.services.users.JwtService;
-import com.coinlift.backend.services.users.UserDetailsServiceImpl;
+import com.coinlift.backend.services.users.security.JwtService;
+import com.coinlift.backend.services.users.security.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

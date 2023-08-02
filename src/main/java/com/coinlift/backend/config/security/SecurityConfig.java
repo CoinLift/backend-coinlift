@@ -1,7 +1,7 @@
 package com.coinlift.backend.config.security;
 
 import com.coinlift.backend.config.security.filters.JwtFilter;
-import com.coinlift.backend.services.users.UserDetailsServiceImpl;
+import com.coinlift.backend.services.users.security.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
