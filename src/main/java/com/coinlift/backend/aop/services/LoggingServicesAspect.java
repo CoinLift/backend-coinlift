@@ -12,7 +12,7 @@ import java.util.Collection;
 @Component
 public class LoggingServicesAspect {
 
-    @Pointcut("execution(public * com.coinlift.backend.services.*.*.*(..)) && !execution(public * com.coinlift.backend.services.users.UserDetailsServiceImpl.*(..))")
+    @Pointcut("execution(public * com.coinlift.backend.services.*.*.*(..)) && !execution(public * com.coinlift.backend.services.users.security.UserDetailsServiceImpl.*(..))")
     public void allPublicMethods() {
     }
 

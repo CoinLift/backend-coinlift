@@ -1,4 +1,4 @@
-package com.coinlift.backend.services.users;
+package com.coinlift.backend.services.users.security;
 
 import com.coinlift.backend.repositories.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
