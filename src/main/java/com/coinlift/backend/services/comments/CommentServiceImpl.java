@@ -9,6 +9,7 @@ import com.coinlift.backend.exceptions.ResourceNotFoundException;
 import com.coinlift.backend.mappers.CommentMapper;
 import com.coinlift.backend.repositories.CommentRepository;
 import com.coinlift.backend.repositories.UserRepository;
+import com.coinlift.backend.services.followers.FollowerService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -16,6 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,10 +31,13 @@ public class CommentServiceImpl implements CommentService {
 
     private final UserRepository userRepository;
 
-    public CommentServiceImpl(CommentRepository commentRepository, CommentMapper commentMapper, UserRepository userRepository) {
+    private final FollowerService followerService;
+
+    public CommentServiceImpl(CommentRepository commentRepository, CommentMapper commentMapper, UserRepository userRepository, FollowerService followerService) {
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
         this.userRepository = userRepository;
+        this.followerService = followerService;
     }
 
     /**
@@ -52,11 +58,11 @@ public class CommentServiceImpl implements CommentService {
         return comments.stream()
                 .map(comment -> new CommentResponseDto(
                         comment.getId(),
-                        comment.getUser().getId(),
                         comment.getContent(),
-                        comment.getCreatedAt(),
+                        Duration.between(comment.getCreatedAt(), LocalDateTime.now()).getSeconds(),
                         isCreator(userId, comment),
-                        isRepliesExists(comment)
+                        isRepliesExists(comment),
+                        followerService.getUserMainInfo(comment.getUser().getId())
                 )).toList();
     }
 
@@ -77,11 +83,11 @@ public class CommentServiceImpl implements CommentService {
         return paginatedComments.stream()
                 .map(reply -> new CommentResponseDto(
                         reply.getId(),
-                        reply.getUser().getId(),
                         reply.getContent(),
-                        reply.getCreatedAt(),
+                        Duration.between(reply.getCreatedAt(), LocalDateTime.now()).getSeconds(),
                         isCreator(userId, reply),
-                        isRepliesExists(reply)
+                        isRepliesExists(reply),
+                        followerService.getUserMainInfo(reply.getUser().getId())
                 ))
                 .toList();
     }
@@ -145,7 +151,6 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponseDto updateComment(CommentRequestDto commentRequestDto, UUID postId, UUID commentId) {
         UUID userId = getUserId();
         Comment comment = getComment(postId, commentId);
-        UUID postUserId = comment.getUser().getId();
 
         checkAccess(userId, comment);
 
@@ -155,11 +160,11 @@ public class CommentServiceImpl implements CommentService {
 
         return new CommentResponseDto(
                 commentId,
-                comment.getUser().getId(),
                 commentRequestDto.content(),
-                comment.getCreatedAt(),
-                isCreator(postUserId, comment),
-                isRepliesExists(comment)
+                Duration.between(comment.getCreatedAt(), LocalDateTime.now()).getSeconds(),
+                true,
+                isRepliesExists(comment),
+                followerService.getUserMainInfo(comment.getUser().getId())
         );
     }
 
