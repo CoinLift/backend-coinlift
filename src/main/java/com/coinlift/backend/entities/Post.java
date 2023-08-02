@@ -31,6 +31,8 @@ public class Post {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    private Integer likeCount;
+
     @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "post", orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
@@ -38,12 +40,13 @@ public class Post {
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "FK_USERS_POSTS"))
     private User user;
 
-    public Post(UUID id, String content, String imageLink, LocalDateTime createdAt, LocalDateTime updatedAt, List<Comment> comments, User user) {
+    public Post(UUID id, String content, String imageLink, LocalDateTime createdAt, LocalDateTime updatedAt, Integer likeCount, List<Comment> comments, User user) {
         this.id = id;
         this.content = content;
         this.imageLink = imageLink;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.likeCount = likeCount;
         this.comments = comments;
         this.user = user;
     }
@@ -89,6 +92,14 @@ public class Post {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Integer getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
     }
 
     public List<Comment> getComments() {

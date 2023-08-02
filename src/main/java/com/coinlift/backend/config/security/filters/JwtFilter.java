@@ -1,7 +1,6 @@
 package com.coinlift.backend.config.security.filters;
 
 import com.coinlift.backend.entities.MyUserDetails;
-import com.coinlift.backend.repositories.TokenRepository;
 import com.coinlift.backend.services.users.security.JwtService;
 import com.coinlift.backend.services.users.security.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
@@ -23,12 +22,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final UserDetailsServiceImpl userDetailsService;
 
-    private final TokenRepository tokenRepository;
-
-    public JwtFilter(JwtService jwtService, UserDetailsServiceImpl userDetailsService, TokenRepository tokenRepository) {
+    public JwtFilter(JwtService jwtService, UserDetailsServiceImpl userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
-        this.tokenRepository = tokenRepository;
     }
 
     @Override
