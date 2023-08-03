@@ -66,6 +66,11 @@ public class PostController {
         return new ResponseEntity<>(postService.getLatestPosts(), HttpStatus.OK);
     }
 
+    @GetMapping("/liked")
+    public ResponseEntity<List<PostDetailsResponseDto>> getAllLikedPosts() {
+        return new ResponseEntity<>(postService.getLikedPosts(), HttpStatus.OK);
+    }
+
     /**
      * Create a new post with an optional image.
      *
