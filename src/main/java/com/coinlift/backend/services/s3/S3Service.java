@@ -33,9 +33,9 @@ public class S3Service {
      * @param key        The unique key to identify the object in the bucket.
      * @param file       The byte array representing the file to be uploaded.
      */
-    public void putObject(String bucketName, String key, byte[] file) {
+    public void putObject(String bucketName, String key, byte[] file, String contentType) {
 
-        byte[] reducedImage = reduceImageQuality(file);
+        byte[] reducedImage = reduceImageQuality(file, contentType);
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -87,7 +87,7 @@ public class S3Service {
      * @return The byte array of the compressed image.
      * @throws RuntimeException if an error occurs while reducing the image quality.
      */
-    private byte[] reduceImageQuality(byte[] imageBytes) {
+    private byte[] reduceImageQuality(byte[] imageBytes, String contentType) {
         int targetWidth = 683;
         int targetHeight = 407;
 
@@ -99,7 +99,7 @@ public class S3Service {
             BufferedImage resizedImage = Scalr.resize(image, Scalr.Method.BALANCED, targetWidth, targetHeight);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            ImageIO.write(resizedImage, "jpeg", outputStream);
+            ImageIO.write(resizedImage, getImageType(contentType), outputStream);
 
             byte[] compressedImage = outputStream.toByteArray();
             log.info("end - reduceImageQuality(): " + LocalDateTime.now());
@@ -109,6 +109,16 @@ public class S3Service {
             log.error("Error reducing image quality");
             throw new RuntimeException(e);
         }
+    }
+
+    private String getImageType(String format) {
+        String[] parts = format.split("/");
+
+        if (parts.length != 2 || !"image".equals(parts[0])) {
+            throw new IllegalArgumentException("Invalid format string: " + format);
+        }
+
+        return parts[1];
     }
 
 }
