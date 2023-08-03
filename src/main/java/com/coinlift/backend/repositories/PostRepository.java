@@ -11,4 +11,8 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     @Query("SELECT p FROM Post p WHERE p.imageLink IS NOT NULL ORDER BY p.createdAt DESC LIMIT 6")
     List<Post> findLatestPosts();
 
+    @Query("""
+            select p from Post p join p.likes l where l.user.id = :userId
+            """)
+    List<Post> findLikedPostsByUserId(UUID userId);
 }
