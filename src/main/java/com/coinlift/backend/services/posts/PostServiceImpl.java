@@ -105,6 +105,26 @@ public class PostServiceImpl implements PostService {
         );
     }
 
+    @Override
+    public List<PostDetailsResponseDto> getLikedPosts() {
+        UUID userId = getUserId();
+
+        List<Post> posts = postRepository.findLikedPostsByUserId(userId);
+
+        return posts.stream()
+                .map(post -> new PostDetailsResponseDto(
+                        post.getId(),
+                        post.getContent(),
+                        getPostImage(post.getId()),
+                        isCreator(userId, post),
+                        Duration.between(post.getCreatedAt(), LocalDateTime.now()).getSeconds(),
+                        post.getComments().size(),
+                        post.getLikeCount(),
+                        followerService.getUserMainInfo(post.getUser().getId())
+                ))
+                .toList();
+    }
+
     /**
      * Removes a post by its ID.
      *
@@ -145,13 +165,16 @@ public class PostServiceImpl implements PostService {
                 s3Service.putObject(
                         s3Buckets.getCustomer(),
                         "post-image/%s".formatted(postImageId),
-                        file.getBytes()
+                        file.getBytes(),
+                        file.getContentType()
                 );
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             post.setImageLink(postImageId);
+            post.setLikeCount(0);
         }
+
         return postRepository.save(post).getId();
     }
 
