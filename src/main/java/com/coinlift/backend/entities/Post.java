@@ -40,7 +40,10 @@ public class Post {
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "FK_USERS_POSTS"))
     private User user;
 
-    public Post(UUID id, String content, String imageLink, LocalDateTime createdAt, LocalDateTime updatedAt, Integer likeCount, List<Comment> comments, User user) {
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes = new ArrayList<>();
+
+    public Post(UUID id, String content, String imageLink, LocalDateTime createdAt, LocalDateTime updatedAt, Integer likeCount, List<Comment> comments, User user, List<Like> likes) {
         this.id = id;
         this.content = content;
         this.imageLink = imageLink;
@@ -49,6 +52,7 @@ public class Post {
         this.likeCount = likeCount;
         this.comments = comments;
         this.user = user;
+        this.likes = likes;
     }
 
     public Post() {
