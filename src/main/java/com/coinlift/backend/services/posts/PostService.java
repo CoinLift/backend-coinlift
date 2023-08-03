@@ -15,6 +15,8 @@ public interface PostService {
 
     PostDetailsResponseDto getPostById(UUID postId, Pageable pageable);
 
+    List<PostDetailsResponseDto> getLikedPosts();
+
     void removePost(UUID postId);
 
     UUID createPost(PostRequestDto postRequestDto, MultipartFile file);
