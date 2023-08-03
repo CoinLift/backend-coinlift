@@ -2,7 +2,7 @@
 This project is called CoinLift and involves the development of a backend system for a cryptocurrency application. The team consists of one backend developer, three frontend developer, and three designers.
 ## Documentation:
 
-#### Swagger Docs -> [LINK](https://backend-coin-lift-production.up.railway.app/swagger-ui/index.html)
+#### Swagger Docs -> [LINK](https://backend-coinlift-production.up.railway.app/swagger-ui/index.html)
 
 ## Getting Started
 
