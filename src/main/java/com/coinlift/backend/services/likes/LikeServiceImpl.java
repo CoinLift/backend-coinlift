@@ -1,13 +1,15 @@
 package com.coinlift.backend.services.likes;
 
 import com.coinlift.backend.entities.Like;
-import com.coinlift.backend.entities.MyUserDetails;
 import com.coinlift.backend.entities.Post;
-import com.coinlift.backend.entities.User;
+import com.coinlift.backend.entities.notification.EventType;
+import com.coinlift.backend.entities.user.MyUserDetails;
+import com.coinlift.backend.entities.user.User;
 import com.coinlift.backend.exceptions.DeniedAccessException;
 import com.coinlift.backend.exceptions.ResourceNotFoundException;
 import com.coinlift.backend.repositories.LikeRepository;
 import com.coinlift.backend.repositories.PostRepository;
+import com.coinlift.backend.services.notifications.NotificationService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,10 +23,12 @@ public class LikeServiceImpl implements LikeService {
 
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
+    private final NotificationService notificationService;
 
-    public LikeServiceImpl(LikeRepository likeRepository, PostRepository postRepository) {
+    public LikeServiceImpl(LikeRepository likeRepository, PostRepository postRepository, NotificationService notificationService) {
         this.likeRepository = likeRepository;
         this.postRepository = postRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -46,6 +50,8 @@ public class LikeServiceImpl implements LikeService {
 
         likeRepository.save(like);
         postRepository.save(post);
+
+        notificationService.notifyUser(user.getUsername(), post.getUser().getId(), EventType.LIKE);
     }
 
     @Override
