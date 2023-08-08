@@ -1,7 +1,7 @@
 package com.coinlift.backend.services.users.security;
 
-import com.coinlift.backend.entities.MyUserDetails;
-import com.coinlift.backend.entities.User;
+import com.coinlift.backend.entities.user.MyUserDetails;
+import com.coinlift.backend.entities.user.User;
 import com.coinlift.backend.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

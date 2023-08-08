@@ -1,4 +1,4 @@
-package com.coinlift.backend.entities;
+package com.coinlift.backend.entities.user;
 
 public enum Role {
     USER, MANAGER, ADMIN

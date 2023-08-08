@@ -1,6 +1,6 @@
 package com.coinlift.backend.config.security.filters;
 
-import com.coinlift.backend.entities.MyUserDetails;
+import com.coinlift.backend.entities.user.MyUserDetails;
 import com.coinlift.backend.services.users.security.JwtService;
 import com.coinlift.backend.services.users.security.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;

@@ -1,4 +1,4 @@
-package com.coinlift.backend.entities;
+package com.coinlift.backend.entities.user;
 
 import jakarta.persistence.*;
 import lombok.Builder;

@@ -1,6 +1,6 @@
 package com.coinlift.backend.services.users.security;
 
-import com.coinlift.backend.entities.MyUserDetails;
+import com.coinlift.backend.entities.user.MyUserDetails;
 import com.coinlift.backend.repositories.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

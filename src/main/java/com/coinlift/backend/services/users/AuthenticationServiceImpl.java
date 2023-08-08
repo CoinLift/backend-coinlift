@@ -3,7 +3,7 @@ package com.coinlift.backend.services.users;
 import com.coinlift.backend.dtos.users.AuthenticationResponse;
 import com.coinlift.backend.dtos.users.UserAuthenticationRequest;
 import com.coinlift.backend.dtos.users.UserRegistrationRequest;
-import com.coinlift.backend.entities.*;
+import com.coinlift.backend.entities.user.*;
 import com.coinlift.backend.exceptions.DuplicateUserException;
 import com.coinlift.backend.exceptions.PasswordMismatchException;
 import com.coinlift.backend.repositories.TokenRepository;
