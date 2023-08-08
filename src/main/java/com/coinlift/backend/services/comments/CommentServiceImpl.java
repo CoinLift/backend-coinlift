@@ -3,13 +3,18 @@ package com.coinlift.backend.services.comments;
 import com.coinlift.backend.dtos.comments.CommentRequestDto;
 import com.coinlift.backend.dtos.comments.CommentResponseDto;
 import com.coinlift.backend.entities.Comment;
-import com.coinlift.backend.entities.MyUserDetails;
+import com.coinlift.backend.entities.Post;
+import com.coinlift.backend.entities.notification.EventType;
+import com.coinlift.backend.entities.user.MyUserDetails;
+import com.coinlift.backend.entities.user.User;
 import com.coinlift.backend.exceptions.DeniedAccessException;
 import com.coinlift.backend.exceptions.ResourceNotFoundException;
 import com.coinlift.backend.mappers.CommentMapper;
 import com.coinlift.backend.repositories.CommentRepository;
+import com.coinlift.backend.repositories.PostRepository;
 import com.coinlift.backend.repositories.UserRepository;
 import com.coinlift.backend.services.followers.FollowerService;
+import com.coinlift.backend.services.notifications.NotificationService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -33,11 +38,17 @@ public class CommentServiceImpl implements CommentService {
 
     private final FollowerService followerService;
 
-    public CommentServiceImpl(CommentRepository commentRepository, CommentMapper commentMapper, UserRepository userRepository, FollowerService followerService) {
+    private final NotificationService notificationService;
+
+    private final PostRepository postRepository;
+
+    public CommentServiceImpl(CommentRepository commentRepository, CommentMapper commentMapper, UserRepository userRepository, FollowerService followerService, NotificationService notificationService, PostRepository postRepository) {
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
         this.userRepository = userRepository;
         this.followerService = followerService;
+        this.notificationService = notificationService;
+        this.postRepository = postRepository;
     }
 
     /**
@@ -105,13 +116,16 @@ public class CommentServiceImpl implements CommentService {
         UUID userId = getUserId();
         Comment parrentComment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("comment with id " + commentId + " not found!"));
+
         Comment comment = commentMapper.toCommentEntity(commentRequestDto, parrentComment.getPost().getId());
 
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("user not found"));
+
         comment.setParentComment(parrentComment);
-        comment.setUser(
-                userRepository.findById(userId)
-                        .orElseThrow(() -> new ResourceNotFoundException("user not found"))
-        );
+        comment.setUser(user);
+
+        notificationService.notifyUser(user.getUsername(), parrentComment.getUser().getId(), EventType.REPLY);
 
         return commentRepository.save(comment).getId();
     }
@@ -128,12 +142,15 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public UUID createComment(CommentRequestDto commentRequestDto, UUID postId) {
         UUID userId = getUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("user not found"));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("post not found"));
         Comment comment = commentMapper.toCommentEntity(commentRequestDto, postId);
 
-        comment.setUser(
-                userRepository.findById(userId)
-                        .orElseThrow(() -> new ResourceNotFoundException("user not found"))
-        );
+        comment.setUser(user);
+
+        notificationService.notifyUser(user.getUsername(), post.getUser().getId(), EventType.COMMENT);
 
         return commentRepository.save(comment).getId();
     }
