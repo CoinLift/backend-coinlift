@@ -3,13 +3,15 @@ package com.coinlift.backend.services.followers;
 import com.coinlift.backend.config.s3.S3Buckets;
 import com.coinlift.backend.dtos.users.FollowerResponseDto;
 import com.coinlift.backend.dtos.users.UserMainInfoDto;
-import com.coinlift.backend.entities.Follower;
-import com.coinlift.backend.entities.MyUserDetails;
-import com.coinlift.backend.entities.User;
+import com.coinlift.backend.entities.notification.EventType;
+import com.coinlift.backend.entities.user.Follower;
+import com.coinlift.backend.entities.user.MyUserDetails;
+import com.coinlift.backend.entities.user.User;
 import com.coinlift.backend.exceptions.DeniedAccessException;
 import com.coinlift.backend.exceptions.ResourceNotFoundException;
 import com.coinlift.backend.repositories.FollowerRepository;
 import com.coinlift.backend.repositories.UserRepository;
+import com.coinlift.backend.services.notifications.NotificationService;
 import com.coinlift.backend.services.s3.S3Service;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,11 +33,14 @@ public class FollowerServiceImpl implements FollowerService {
 
     private final S3Buckets s3Buckets;
 
-    public FollowerServiceImpl(UserRepository userRepository, FollowerRepository followerRepository, S3Service s3Service, S3Buckets s3Buckets) {
+    private final NotificationService notificationService;
+
+    public FollowerServiceImpl(UserRepository userRepository, FollowerRepository followerRepository, S3Service s3Service, S3Buckets s3Buckets, NotificationService notificationService) {
         this.userRepository = userRepository;
         this.followerRepository = followerRepository;
         this.s3Service = s3Service;
         this.s3Buckets = s3Buckets;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -60,6 +65,8 @@ public class FollowerServiceImpl implements FollowerService {
 
         from.setFollowingCount(from.getFollowingCount() + 1);
         to.setFollowersCount(to.getFollowersCount() + 1);
+
+        notificationService.notifyUser(from.getUsername(), to.getId(), EventType.FOLLOW);
 
         followerRepository.save(follow);
         userRepository.saveAll(List.of(from, to));
