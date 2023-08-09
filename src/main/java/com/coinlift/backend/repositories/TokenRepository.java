@@ -1,6 +1,6 @@
 package com.coinlift.backend.repositories;
 
-import com.coinlift.backend.entities.AuthenticationToken;
+import com.coinlift.backend.entities.user.AuthenticationToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

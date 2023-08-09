@@ -1,7 +1,7 @@
 package com.coinlift.backend.repositories;
 
 import com.coinlift.backend.entities.Like;
-import com.coinlift.backend.entities.User;
+import com.coinlift.backend.entities.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

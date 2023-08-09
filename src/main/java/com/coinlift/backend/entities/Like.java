@@ -1,5 +1,6 @@
 package com.coinlift.backend.entities;
 
+import com.coinlift.backend.entities.user.User;
 import jakarta.persistence.*;
 
 import java.util.UUID;

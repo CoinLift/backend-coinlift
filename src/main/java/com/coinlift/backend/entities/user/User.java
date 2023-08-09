@@ -1,5 +1,7 @@
-package com.coinlift.backend.entities;
+package com.coinlift.backend.entities.user;
 
+import com.coinlift.backend.entities.Comment;
+import com.coinlift.backend.entities.Post;
 import jakarta.persistence.*;
 import lombok.Builder;
 

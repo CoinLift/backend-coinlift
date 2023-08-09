@@ -4,8 +4,8 @@ import com.coinlift.backend.config.s3.S3Buckets;
 import com.coinlift.backend.dtos.posts.PostDetailsResponseDto;
 import com.coinlift.backend.dtos.posts.PostRequestDto;
 import com.coinlift.backend.dtos.posts.PostShortResponseDto;
-import com.coinlift.backend.entities.MyUserDetails;
 import com.coinlift.backend.entities.Post;
+import com.coinlift.backend.entities.user.MyUserDetails;
 import com.coinlift.backend.exceptions.DeniedAccessException;
 import com.coinlift.backend.exceptions.ResourceNotFoundException;
 import com.coinlift.backend.mappers.PostMapper;
@@ -42,7 +42,6 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
 
     private final FollowerService followerService;
-
 
     public PostServiceImpl(PostRepository postRepository, PostMapper postMapper, S3Service s3Service, S3Buckets s3Buckets, UserRepository userRepository, FollowerService followerService) {
         this.postRepository = postRepository;
@@ -286,7 +285,7 @@ public class PostServiceImpl implements PostService {
         return userDetails.user().getId();
     }
 
-    private static UUID getUserIdOrNull() {
+    private UUID getUserIdOrNull() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof AnonymousAuthenticationToken) {
             return null;
@@ -295,7 +294,7 @@ public class PostServiceImpl implements PostService {
         return userDetails.user().getId();
     }
 
-    private static boolean isCreator(UUID userId, Post post) {
+    private boolean isCreator(UUID userId, Post post) {
         if (userId == null) {
             return false;
         }

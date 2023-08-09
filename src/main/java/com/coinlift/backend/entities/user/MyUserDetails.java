@@ -1,4 +1,4 @@
-package com.coinlift.backend.entities;
+package com.coinlift.backend.entities.user;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
